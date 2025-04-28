@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delivery Invoice</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        label, input { display: block; margin: 10px 0; }
+        button { margin-top: 15px; padding: 10px 20px; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        #result { margin-top: 30px; }
+    </style>
+</head>
+<body>
+
+    <h2>Delivery Invoice Calculator</h2>
+
+    <label>Number of Items:
+        <input type="number" id="items" min="0" required>
+    </label>
+
+    <label>Number of Men:
+        <input type="number" id="men" min="1" required>
+    </label>
+
+    <label>Total Hours Worked:
+        <input type="number" id="hours" min="0" step="0.1" required>
+    </label>
+
+    <button onclick="calculateInvoice()">Generate Invoice</button>
+
+    <div id="result"></div>
+
+    <script>
+        function calculateInvoice() {
+            const ratePerItem = 7.5;
+            const deliveryUnit = 162;
+            const freePerUnit = 1; // 1 man-hour free per $162
+            const manHourRate = 84.50;
+
+            const items = parseFloat(document.getElementById('items').value);
+            const men = parseFloat(document.getElementById('men').value);
+            const hours = parseFloat(document.getElementById('hours').value);
+
+            if (isNaN(items) || isNaN(men) || isNaN(hours) || items <= 0 || men <= 0 || hours <= 0) {
+                document.getElementById('result').innerHTML = "Please enter valid positive numbers.";
+                return;
+            }
+
+            const deliveryValue = items * ratePerItem;
+            const deliveryCharge = 162.00; // Fixed base delivery charge
+
+            const freeManHours = (deliveryValue / deliveryUnit) * freePerUnit;
+            const totalManHours = men * hours;
+            const chargeableManHours = Math.max(0, totalManHours - freeManHours);
+            const laborCharge = chargeableManHours * manHourRate;
+            const totalDue = deliveryCharge + laborCharge;
+
+            let invoiceHTML = `
+                <h3>Invoice</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                Base Delivery Charge<br>
+                                <small>
+                                    Standard base delivery charge applies for up to $162 worth of delivery.
+                                </small>
+                            </td>
+                            <td>$${deliveryCharge.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Labor Charge<br>
+                                <small>
+                                    (${men} men × ${hours} hours) = ${totalManHours.toFixed(2)} man-hours.<br>
+				    Delivery value from ${items} items × $7.50 = $${deliveryValue.toFixed(2)}.<br>
+                                    Free allowance: $${deliveryValue.toFixed(2)} ÷ $162 = ${freeManHours.toFixed(2)} man-hours based on delivery value.<br>
+                                    Chargeable man-hours = ${totalManHours.toFixed(2)} - ${freeManHours.toFixed(2)} = ${chargeableManHours.toFixed(2)}.<br>
+                                    Labor rate: $84.50 per man-hour.
+                                </small>
+                            </td>
+                            <td>$${laborCharge.toFixed(2)}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Total Due</th>
+                            <th>$${totalDue.toFixed(2)}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            document.getElementById('result').innerHTML = invoiceHTML;
+        }
+    </script>
+
+</body>
+</html>
