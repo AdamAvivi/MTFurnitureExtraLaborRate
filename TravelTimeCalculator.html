@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distance Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5aM-yQbUuzkKW5gLHpJD4bKcdXHXyznQ&libraries=places"></script>
+</head>
+<body>
+    <h1>Travel Time Calculator</h1>
+    
+    <p>Instructions:<br> Enter the starting and ending addresses in the designated fields and click "Calculate."
+    Do <em>not</em> enter the warehouse address or any intermediate stops. <br><br>Please ensure complete and accurate addresses with Town, State, and Zip Code for precise calculations.</p>   
+   
+    <label for="address1">First Stop:</label>
+    <input type="text" id="address1" placeholder="Enter address 1">
+
+    <label for="address2">Last Stop:</label>
+    <input type="text" id="address2" placeholder="Enter address 2">
+
+    <button onclick="calculateDistance()">Calculate Distance</button>
+
+    <p id="result"></p>
+
+    <script>
+        function calculateDistance() {
+            var address1 = document.getElementById('address1').value.trim();
+            var address2 = document.getElementById('address2').value.trim();
+            var fixedAddress = '303 Smith Street, Farmingdale, NY';
+
+            if (address1 === "" || address2 === "") {
+                alert("Please enter both addresses.");
+                return;
+            }
+
+            var service = new google.maps.DistanceMatrixService();
+
+            service.getDistanceMatrix({
+                origins: [fixedAddress, address1, address2],
+                destinations: [address1, address2, fixedAddress],
+                travelMode: 'DRIVING',
+                unitSystem: google.maps.UnitSystem.IMPERIAL
+            }, function(response, status) {
+                if (status === 'OK') {
+                    var distancePickup = response.rows[0].elements[0].distance.value; // address1 to fixedAddress
+                    var distanceMove = response.rows[1].elements[1].distance.value;  // fixedAddress to address2
+                    var distanceBack = response.rows[2].elements[2].distance.value;  // address2 to address1
+
+                    var totalDistance = distancePickup + distanceMove + distanceBack;
+                    var totalDistanceInMiles = (totalDistance / 1609.34).toFixed(2); // Convert meters to miles
+
+		    var distancePickupMiles = (distancePickup / 1609.34).toFixed(2);
+	            var distanceMoveMiles = (distanceMove / 1609.34).toFixed(2);
+	            var distanceBackMiles = (distanceBack / 1609.34).toFixed(2);
+
+
+                    document.getElementById('result').innerHTML = `
+                        Distance from  303 Smith Street to  ${address1}: ${distancePickupMiles} miles<br>
+                        Distance from ${address1} to ${address2}: ${distanceMoveMiles} miles<br>
+                        Distance from ${address2} back to 303 Smith Street: ${distanceBackMiles} miles<br>
+                        <strong>Total Distance: ${totalDistanceInMiles} miles</strong>
+                    `;
+                } else {
+                    alert('Error calculating distance. Please try again.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
