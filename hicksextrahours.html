@@ -53,11 +53,12 @@
             const deliveryCharge = 162.00; // Fixed base delivery charge
 
             const freeManHours = (deliveryValue / deliveryUnit) * freePerUnit;
+            let freeAllowance = (items < 22) ? 1 : (deliveryValue / deliveryUnit) * freePerUnit;
             const totalManHours = men * hours;
-            const chargeableManHours = Math.max(0, totalManHours - freeManHours);
+            const chargeableManHours = Math.max(0, totalManHours - freeAllowance);
             const laborCharge = chargeableManHours * manHourRate;
             const totalDue = deliveryCharge + laborCharge;
-
+            
             let invoiceHTML = `
                 <h3>Invoice</h3>
                 <table>
@@ -83,8 +84,8 @@
                                 <small>
                                     (${men} men × ${hours} hours) = ${totalManHours.toFixed(2)} man-hours.<br>
                                     Delivery value from ${items} items × $7.50 = $${deliveryValue.toFixed(2)}.<br>
-                                    Free allowance: $${deliveryValue.toFixed(2)} ÷ $162 = ${freeManHours.toFixed(2)} man-hours based on delivery value.<br>
-                                    Chargeable man-hours = ${totalManHours.toFixed(2)} - ${freeManHours.toFixed(2)} = ${chargeableManHours.toFixed(2)}.<br>
+                                    Free allowance: $${deliveryValue.toFixed(2)} ÷ $162 = ${freeAllowance.toFixed(2)} man-hours based on delivery value. If there are less than 22 items, this number is automatically set to 1. <br>
+                                    Chargeable man-hours = ${totalManHours.toFixed(2)} - ${freeAllowance.toFixed(2)} = ${chargeableManHours.toFixed(2)}.<br>
                                     Labor rate: $84.50 per man-hour.
                                 </small>
                             </td>
