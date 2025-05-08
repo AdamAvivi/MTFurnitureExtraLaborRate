@@ -198,7 +198,7 @@
 
       const Cc = C + (D * 0.3667);
       const clabor = ((A * B) * Cc) * 1.25;
-      const ctruck = (E * C > 225) ? 225 : E * C;
+      let ctruck = (E * C > 225) ? 225 : E * C;
       const cfuel = F * G;
       const materials = H * 2;
       const cost = clabor + ctruck + cfuel + materials;
